@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pakar Gaji - PT 84 Abadi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .result-animate { 
+            animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; 
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-bar { transition: width 1.2s cubic-bezier(0.65, 0, 0.35, 1); }
+        
+        .logo-box {
+            background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            border-radius: 12px;
+            width: 44px;
+            height: 44px;
+            font-size: 1.2rem;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .input-dark {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .input-dark:focus {
+            border-color: #6366f1;
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+            outline: none;
+        }
+
+        .history-row {
+            animation: slideIn 0.4s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="text-slate-200 min-h-screen pb-20">
+
+    <!-- Navbar -->
+    <nav class="border-b border-white/5 sticky top-0 z-50 bg-[#0f172a]/90 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="logo-box">84</div>
+                <div>
+                    <span class="font-bold text-xl tracking-tight block leading-none text-white">PT 84 ABADI</span>
+                    <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.2em]">Penyesuaian Gaji Karyawan</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex flex-col items-end">
+                    <div class="text-xs text-indigo-400 font-medium">Forward Chaining</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-10 px-6">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Side Panel: Inputs -->
+            <section class="lg:col-span-4 space-y-6">
+                <div class="glass-panel p-8 rounded-[2rem] shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-6 opacity-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+
+                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                        <span class="w-2 h-6 bg-indigo-500 rounded-full"></span>
+                        Data Karyawan
+                    </h2>
+
+                    <div class="space-y-5">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">ID Karyawan</label>
+                                <input type="text" id="employeeID" placeholder="NIK-84..." class="input-dark w-full rounded-xl p-3 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Nama Lengkap</label>
+                                <input type="text" id="employeeName" placeholder="Nama..." class="input-dark w-full rounded-xl p-3 text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Masa Kerja (Thn)</label>
+                            <input type="number" id="masaKerja" min="0" class="input-dark w-full rounded-xl p-3 text-sm" value="3">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Rating Performa</label>
+                            <select id="performa" class="input-dark w-full rounded-xl p-3 text-sm appearance-none">
+                                <option value="1">1 - Kurang</option>
+                                <option value="2">2 - Cukup</option>
+                                <option value="3" selected>3 - Baik</option>
+                                <option value="4">4 - Sangat Baik</option>
+                                <option value="5">5 - Istimewa</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-3 pt-2">
+                            <label class="flex items-center p-3 rounded-xl cursor-pointer bg-white/5 border border-white/5 hover:border-indigo-500/50 transition-all group">
+                                <input type="checkbox" id="sertifikasi" class="w-5 h-5 rounded border-white/20 bg-transparent text-indigo-600 focus:ring-indigo-500">
+                                <span class="ml-3 text-sm font-medium text-slate-300 group-hover:text-white transition-colors">Sertifikasi Kompetensi</span>
+                            </label>
+
+                            <label class="flex items-center p-3 rounded-xl cursor-pointer bg-white/5 border border-white/5 hover:border-indigo-500/50 transition-all group">
+                                <input type="checkbox" id="proyekBesar" class="w-5 h-5 rounded border-white/20 bg-transparent text-indigo-600 focus:ring-indigo-500">
+                                <span class="ml-3 text-sm font-medium text-slate-300 group-hover:text-white transition-colors">Kontribusi Proyek Utama</span>
+                            </label>
+                        </div>
+
+                        <button onclick="prosesForwardChaining()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-3 mt-4 active:scale-95">
+                            <span>Jalankan Inferensi</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Panel: Results & Logic -->
+            <section class="lg:col-span-8 space-y-6">
+                <!-- Top: Result Card -->
+                <div id="resultCard" class="glass-panel p-8 rounded-[2rem] hidden result-animate border-t-4 border-t-indigo-500">
+                    <div class="flex flex-col md:flex-row gap-8 items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="px-3 py-1 bg-indigo-500/20 text-indigo-400 text-[10px] font-black rounded-full uppercase tracking-tighter" id="resID">ID: -</span>
+                                <span class="text-slate-400 text-xs font-bold" id="resName">Nama Karyawan</span>
+                            </div>
+                            <div class="flex items-baseline gap-2">
+                                <span id="rekomendasiOutput" class="text-7xl font-black text-white leading-none tracking-tighter">0%</span>
+                                <span class="text-slate-500 font-bold text-xl">KENAIKAN</span>
+                            </div>
+                            <p id="kesimpulanText" class="mt-6 text-slate-400 text-sm leading-relaxed border-l-2 border-indigo-500/30 pl-4"></p>
+                        </div>
+                        <div class="w-full md:w-48">
+                            <div class="flex justify-between text-[10px] font-black text-slate-500 uppercase mb-2">
+                                <span>Skor Kelayakan</span>
+                                <span id="progressText" class="text-indigo-400">0%</span>
+                            </div>
+                            <div class="h-3 w-full bg-slate-800 rounded-full overflow-hidden p-0.5 border border-white/5">
+                                <div id="innerProgressBar" class="h-full bg-gradient-to-r from-indigo-600 to-blue-400 progress-bar rounded-full w-0 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom: Process Steps -->
+                <div class="glass-panel rounded-[2rem] overflow-hidden">
+                    <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/2">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-indigo-500/10 rounded-lg text-indigo-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                </svg>
+                            </div>
+                            <h2 class="font-bold text-white text-sm uppercase tracking-widest">Analisis</h2>
+                        </div>
+                        <span class="text-[10px] font-bold text-slate-500" id="stepCounter">Siap Menganalisis</span>
+                    </div>
+                    <div id="inferenceSteps" class="p-6 space-y-3 max-h-[300px] overflow-y-auto">
+                        <div class="text-center py-10 opacity-30">
+                            <p class="text-sm italic">Belum ada data yang diproses.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- History Section -->
+        <section class="mt-12">
+            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                <span class="w-2 h-6 bg-emerald-500 rounded-full"></span>
+                Log Riwayat Penilaian
+            </h2>
+            <div class="glass-panel rounded-3xl overflow-hidden border border-white/5">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-white/5 text-slate-500 uppercase text-[10px] font-black tracking-widest">
+                        <tr>
+                            <th class="p-5">ID Karyawan</th>
+                            <th class="p-5">Nama Karyawan</th>
+                            <th class="p-5">Rating</th>
+                            <th class="p-5 text-center">Kenaikan</th>
+                            <th class="p-5">Waktu Analisis</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody" class="divide-y divide-white/5">
+                        <tr>
+                            <td colspan="5" class="p-10 text-center text-slate-600 italic">Belum ada riwayat penilaian.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const historyData = [];
+
+        function prosesForwardChaining() {
+            const empID = document.getElementById('employeeID').value || "TEMP-84";
+            const empName = document.getElementById('employeeName').value || "Guest User";
+            
+            const facts = {
+                id: empID,
+                name: empName,
+                masaKerja: parseInt(document.getElementById('masaKerja').value) || 0,
+                performa: parseInt(document.getElementById('performa').value),
+                sertifikasi: document.getElementById('sertifikasi').checked,
+                proyekBesar: document.getElementById('proyekBesar').checked,
+                status: null,
+                bonus: null,
+                kenaikan: 0,
+                keterangan: ""
+            };
+
+            const stepsContainer = document.getElementById('inferenceSteps');
+            stepsContainer.innerHTML = "";
+            let stepCount = 0;
+
+            function addStep(rule, text, match, result) {
+                stepCount++;
+                const div = document.createElement('div');
+                div.className = `p-4 rounded-xl border transition-all ${match ? 'bg-indigo-500/10 border-indigo-500/30' : 'bg-white/2 border-white/5 opacity-40'}`;
+                div.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">${rule}</span>
+                        <span class="text-[9px] font-bold ${match ? 'text-indigo-400' : 'text-slate-600'}">${match ? 'HIT' : 'MISS'}</span>
+                    </div>
+                    <p class="text-xs font-semibold text-white">${text}</p>
+                    ${match ? `<p class="mt-2 text-[10px] text-indigo-300 font-bold uppercase tracking-tight">→ Result: ${result}</p>` : ''}
+                `;
+                stepsContainer.appendChild(div);
+                document.getElementById('stepCounter').innerText = stepCount + " Langkah Proses";
+            }
+
+            // --- INFERENCE ENGINE ---
+            
+            // 1. Eligibility Check
+            let r1 = facts.masaKerja >= 2 && facts.performa >= 3;
+            if(r1) facts.status = "Layak";
+            addStep("Rule-01", "Cek Masa Kerja (≥ 2 Thn) & Performa Dasar (≥ 3)", r1, "Karyawan Masuk Antrean Kenaikan");
+
+            // 2. High Performance Check
+            let r2 = facts.performa >= 4;
+            if(r2) facts.bonus = "High-Performer";
+            addStep("Rule-02", "Cek Apakah Karyawan Kategori High Performer (Rating ≥ 4)", r2, "Prioritas Insentif Diaktifkan");
+
+            if (facts.status === "Layak") {
+                facts.kenaikan = 5; 
+                facts.keterangan = "Memenuhi kriteria dasar penyesuaian gaji PT 84 Abadi.";
+
+                // 3. Competency Multiplier
+                let r3 = facts.sertifikasi === true;
+                if(r3) {
+                    facts.kenaikan = 10;
+                    facts.keterangan = "Mendapat kenaikan 10% karena memiliki sertifikasi kompetensi baru.";
+                }
+                addStep("Rule-03", "Analisis Kepemilikan Sertifikasi Baru", r3, "Plafon Kenaikan Naik ke 10%");
+
+                // 4. Strategic Contribution
+                let r4 = facts.proyekBesar === true;
+                if(r4) {
+                    facts.kenaikan = 15;
+                    facts.keterangan = "Mendapat kenaikan 15% atas kontribusi besar pada proyek strategis perusahaan.";
+                }
+                addStep("Rule-04", "Evaluasi Dampak Proyek Terhadap Perusahaan", r4, "Plafon Kenaikan Naik ke 15%");
+
+                // 5. Max Tier
+                let r5 = (facts.performa === 5) && (facts.proyekBesar || facts.sertifikasi);
+                if(r5) {
+                    facts.kenaikan = 20;
+                    facts.keterangan = "PREMIUM REWARD 20%: Karyawan dengan performa sempurna dan kontribusi luar biasa.";
+                }
+                addStep("Rule-05", "Validasi Tier Maksimal (Rating 5 + Ekstra Mile)", r5, "Disetujui untuk Kenaikan Maksimal 20%");
+
+            } else {
+                facts.kenaikan = 0;
+                facts.keterangan = "Belum layak untuk penyesuaian gaji periode ini (Masa kerja < 2 thn atau rating < 3).";
+                addStep("Final", "Syarat Kelayakan Dasar Tidak Terpenuhi", false, "Kenaikan 0%");
+            }
+
+            // Update UI Result
+            document.getElementById('resultCard').classList.remove('hidden');
+            document.getElementById('resID').innerText = "ID: " + facts.id;
+            document.getElementById('resName').innerText = facts.name;
+            animateValue("rekomendasiOutput", 0, facts.kenaikan, 1000);
+            document.getElementById('kesimpulanText').innerText = facts.keterangan;
+            
+            const progress = (facts.kenaikan / 20) * 100;
+            document.getElementById('innerProgressBar').style.width = progress + "%";
+            document.getElementById('progressText').innerText = facts.kenaikan + "%";
+
+            // Add to History
+            addToHistory(facts);
+        }
+
+        function addToHistory(facts) {
+            const historyBody = document.getElementById('historyBody');
+            if (historyData.length === 0) historyBody.innerHTML = "";
+
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            
+            const entry = {
+                id: facts.id,
+                name: facts.name,
+                rating: facts.performa,
+                kenaikan: facts.kenaikan,
+                time: timeStr
+            };
+
+            historyData.unshift(entry);
+
+            const row = document.createElement('tr');
+            row.className = "history-row hover:bg-white/2 transition-colors group";
+            row.innerHTML = `
+                <td class="p-5 font-mono text-xs text-indigo-400 font-bold">${entry.id}</td>
+                <td class="p-5 text-white font-semibold">${entry.name}</td>
+                <td class="p-5">
+                    <div class="flex gap-1">
+                        ${Array(5).fill(0).map((_, i) => `
+                            <div class="w-1.5 h-1.5 rounded-full ${i < entry.rating ? 'bg-indigo-500' : 'bg-slate-700'}"></div>
+                        `).join('')}
+                    </div>
+                </td>
+                <td class="p-5 text-center">
+                    <span class="px-3 py-1 rounded-lg ${entry.kenaikan > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-500/10 text-slate-500'} font-black text-xs">
+                        +${entry.kenaikan}%
+                    </span>
+                </td>
+                <td class="p-5 text-slate-500 font-medium text-xs">${entry.time}</td>
+            `;
+            
+            if (historyBody.firstChild) {
+                historyBody.insertBefore(row, historyBody.firstChild);
+            } else {
+                historyBody.appendChild(row);
+            }
+        }
+
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(eased * (end - start) + start);
+                obj.innerHTML = current + "%";
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+    </script>
+</body>
+</html>
